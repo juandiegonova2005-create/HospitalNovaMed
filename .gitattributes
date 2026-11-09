@@ -1,0 +1,12 @@
+# Normalizacion de finales de linea
+* text=auto
+
+# Binarios (no convertir)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.jar binary
+*.war binary

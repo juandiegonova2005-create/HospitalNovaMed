@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Configuracion del contexto de la aplicacion.
+
+  - No se define "path": el contexto lo determina el nombre del WAR
+    (ROOT.war en Azure, ProyectoFina8semestre.war en local y en Docker).
+
+  - suspendWrappedResponseAfterForward="false" es OBLIGATORIO:
+    Tomcat 11 lo activa por defecto y, al terminar un forward(), cierra la
+    respuesta real ANTES de que FiltroAsistente pueda inyectar el widget.
+    El resultado era una pagina en blanco (HTTP 200, 0 bytes) cada vez que
+    un servlet hacia forward, por ejemplo al fallar el login.
+-->
+<Context suspendWrappedResponseAfterForward="false">
+</Context>

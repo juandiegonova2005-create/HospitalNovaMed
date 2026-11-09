@@ -1,0 +1,78 @@
+# =====================================================================
+# Hospital NovaMed - Docker Compose
+#
+#   docker compose up -d --build
+#   http://localhost:8081/ProyectoFina8semestre/
+#
+# Servicios:
+#   db  -> MySQL 8.0.41 con los datos iniciales de docker/mysql/init/
+#   app -> Tomcat 11 + Java 17 con el WAR compilado en la imagen
+#
+# Los puertos se pueden cambiar en .env (ver .env.example).
+# =====================================================================
+
+name: novamed
+
+services:
+  db:
+    image: mysql:8.0.41
+    container_name: novamed-db
+    restart: unless-stopped
+    command:
+      # lower-case-table-names=1 es obligatorio: el codigo usa "Usuario",
+      # "Perfil", "gesActividad"... y en Linux MySQL distingue mayusculas.
+      # Debe quedar fijado al crear el volumen por primera vez.
+      - --lower-case-table-names=1
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-novamed_root_2026}
+      MYSQL_DATABASE: ${NOVAMED_DB_NAME:-HospitalDB}
+      MYSQL_USER: ${NOVAMED_DB_USER:-novamed}
+      MYSQL_PASSWORD: ${NOVAMED_DB_PASS:-NovaMed#2026}
+      TZ: UTC
+    volumes:
+      - db_data:/var/lib/mysql
+      # Solo se ejecuta cuando el volumen esta vacio (primer arranque).
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+    ports:
+      # Solo accesible desde este equipo; no lo expongas a Internet.
+      - "127.0.0.1:${NOVAMED_DB_PORT:-3307}:3306"
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: novamed-app:local
+    container_name: novamed-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # URL completa: dentro de la red de Docker no hace falta TLS.
+      NOVAMED_DB_URL: "jdbc:mysql://db:3306/${NOVAMED_DB_NAME:-HospitalDB}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8"
+      NOVAMED_DB_HOST: db:3306
+      NOVAMED_DB_NAME: ${NOVAMED_DB_NAME:-HospitalDB}
+      NOVAMED_DB_USER: ${NOVAMED_DB_USER:-novamed}
+      NOVAMED_DB_PASS: ${NOVAMED_DB_PASS:-NovaMed#2026}
+      NOVAMED_LOG_DIR: /usr/local/tomcat/logs
+      NOVAMED_UPLOAD_DIR: /data/uploads
+      TZ: UTC
+    ports:
+      - "${NOVAMED_HTTP_PORT:-8081}:8080"
+    volumes:
+      # Documentos subidos: sobreviven a reinicios y rebuilds
+      - uploads:/data/uploads
+      # novamed-error.log visible desde el host
+      - ./docker/logs:/usr/local/tomcat/logs
+
+volumes:
+  db_data:
+  uploads:

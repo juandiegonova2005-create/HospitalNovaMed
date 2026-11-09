@@ -1,0 +1,46 @@
+# Salidas de compilacion de NetBeans
+build/
+dist/
+target/
+*.class
+
+# Configuracion local de NetBeans (rutas y servidor de cada equipo)
+nbproject/private/
+
+# Registros y archivos temporales
+*.log
+logs/
+*.tmp
+*.bak
+*.orig
+*.swp
+hs_err_pid*
+
+# Entornos y credenciales (nunca subir)
+.env
+.env.*
+!.env.example
+deploy/azure-deploy.json
+deploy/azure-secrets.txt
+*.pem
+*.p12
+*.jks
+
+# Docker
+docker/logs/*
+!docker/logs/.gitkeep
+
+# Empaquetados
+*.zip
+*.rar
+*.war
+*.ear
+*.jar.tmp
+
+# Editores y sistema
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
+*~

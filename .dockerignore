@@ -1,0 +1,22 @@
+# Contexto de construccion de Docker: solo lo que la imagen necesita.
+# Los volumenes de docker-compose (docker/logs, docker/mysql/init) se leen
+# del disco en tiempo de ejecucion, no del contexto de build.
+
+build/
+dist/
+nbproject/
+docker/logs/
+docker/mysql/init/
+
+.git/
+.gitignore
+*.log
+*.zip
+*.war
+.env
+.env.*
+deploy/azure-deploy.json
+deploy/azure-secrets.txt
+
+*.md
+README*
