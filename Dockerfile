@@ -26,7 +26,7 @@ COPY lib ./lib
 #  - copia web/ al staging
 #  - compila src/java con el servlet-api de Tomcat y las librerias del proyecto
 #  - copia los .jar a WEB-INF/lib
-#  - quita META-INF/context.xml (en la nube el contexto lo define el WAR)
+#  - escribe META-INF/context.xml (sin "path" y con el flag de Tomcat 11)
 #  - empaqueta todo en un WAR
 RUN mkdir -p build/WEB-INF/classes \
  && cp -R web/. build/ \
@@ -36,6 +36,12 @@ RUN mkdir -p build/WEB-INF/classes \
         -d build/WEB-INF/classes @sources.txt \
  && mkdir -p build/WEB-INF/lib \
  && cp lib/*.jar build/WEB-INF/lib/ \
+ && mkdir -p build/META-INF \
+ && printf '%s\n' \
+      '<?xml version="1.0" encoding="UTF-8"?>' \
+      '<Context suspendWrappedResponseAfterForward="false">' \
+      '</Context>' \
+      > build/META-INF/context.xml \
  && cd build \
  && jar --create --file /tmp/ProyectoFina8semestre.war .
 

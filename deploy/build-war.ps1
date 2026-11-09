@@ -40,10 +40,27 @@ try {
     New-Item -ItemType Directory -Path $libOut -Force | Out-Null
     Copy-Item (Join-Path $root "lib\*.jar") $libOut -Force
 
-    # Se conserva META-INF\context.xml: no define "path" (el contexto lo da el
-    # nombre del WAR) y aporta suspendWrappedResponseAfterForward="false",
-    # necesario para que FiltroAsistente pueda inyectar el widget despues de
-    # un forward() en Tomcat 11.
+    # El context.xml se escribe aqui a proposito. NetBeans puede volver a
+    # anadir path="/ProyectoFina8semestre" al desplegar en local, y ese atributo
+    # rompe ROOT.war en Azure (el contexto lo define el nombre del WAR).
+    # suspendWrappedResponseAfterForward="false" es obligatorio en Tomcat 11:
+    # sin el, el forward() cierra la respuesta antes de que FiltroAsistente
+    # inyecte el widget y el login fallido devuelve una pagina en blanco.
+    $metaInf = Join-Path $stage "META-INF"
+    New-Item -ItemType Directory -Path $metaInf -Force | Out-Null
+    $contextXml = @"
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Configuracion del contexto de la aplicacion.
+  Sin atributo "path": el contexto lo determina el nombre del WAR.
+  suspendWrappedResponseAfterForward="false" es obligatorio para que
+  FiltroAsistente pueda inyectar el widget despues de un forward().
+-->
+<Context suspendWrappedResponseAfterForward="false">
+</Context>
+"@
+    $utf8SinBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText((Join-Path $metaInf "context.xml"), $contextXml, $utf8SinBom)
 
     if ([string]::IsNullOrWhiteSpace($OutDir)) {
         $OutDir = Join-Path $root "dist"
