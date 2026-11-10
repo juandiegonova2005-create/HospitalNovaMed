@@ -17,6 +17,7 @@ El proyecto está **dockerizado** (aplicación + base de datos) y además se enc
 - [Ejecución en NetBeans / Tomcat local](#ejecución-en-netbeans--tomcat-local)
 - [Despliegue en Azure](#despliegue-en-azure)
 - [Credenciales de prueba](#credenciales-de-prueba)
+- [Recuperación de contraseña por correo](#recuperación-de-contraseña-por-correo)
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Documentación](#documentación)
 - [Datos y privacidad](#datos-y-privacidad)
@@ -93,6 +94,7 @@ El detalle de cada control y sus pruebas está en [`CAMBIOS_SEGURIDAD.md`](CAMBI
 | Servidor | Apache Tomcat 11 |
 | Base de datos | MySQL 8.0 |
 | Driver | mysql-connector-j 9.6.0 |
+| Correo | Jakarta Mail 2.0.1 (SMTP) |
 | Hash | jBCrypt 0.4 |
 | Contenedores | Docker + Docker Compose |
 | Nube | Azure App Service (Linux) + Azure Database for MySQL Flexible Server |
@@ -218,6 +220,38 @@ Costos y administración de la base: [`COSTOS_AZURE.md`](COSTOS_AZURE.md).
 | `usr2000` | `Temporal#2026` | Usuario |
 
 En Docker, el usuario de la base de datos es `novamed` / `NovaMed#2026` (valor local de demostración, definido en `docker-compose.yml`).
+
+---
+
+## Recuperación de contraseña por correo
+
+La opción **"Olvidé mi contraseña"** genera un token de un solo uso (vence en
+30 minutos, se guarda hasheado y queda auditado) y envía el enlace al correo
+registrado del usuario.
+
+El envío real se configura por variables de entorno; nunca se guardan claves en
+el código:
+
+| Variable | Ejemplo (Gmail) |
+|---|---|
+| `NOVAMED_SMTP_HOST` | `smtp.gmail.com` |
+| `NOVAMED_SMTP_PORT` | `587` |
+| `NOVAMED_SMTP_USER` | `tucorreo@gmail.com` |
+| `NOVAMED_SMTP_PASS` | clave de aplicación de Gmail |
+| `NOVAMED_SMTP_FROM` | `tucorreo@gmail.com` |
+| `NOVAMED_SMTP_SSL` | `false` (usa `true` con el puerto 465) |
+
+**En Gmail:** activa la verificación en dos pasos y crea una
+[clave de aplicación](https://myaccount.google.com/apppasswords). Usa esa clave
+en `NOVAMED_SMTP_PASS` (no la contraseña normal de la cuenta).
+
+En Docker se definen en `.env` (ver `.env.example`). En Azure, con
+`az webapp config appsettings set` (ver [`DESPLIEGUE_AZURE.md`](DESPLIEGUE_AZURE.md)).
+
+Si no se configura el SMTP, el enlace se escribe en `novamed-error.log`, de modo
+que el flujo sigue siendo demostrable sin credenciales.
+
+> El enlace se envía a `usuario.email`, así que ese dato debe ser un buzón real.
 
 ---
 

@@ -92,7 +92,15 @@ El log de errores de la aplicación queda en `docker\logs\novamed-error.log`.
 | `NOVAMED_DB_PASS` | `NovaMed#2026` (cambiable en `.env`) |
 | `NOVAMED_LOG_DIR` | `/usr/local/tomcat/logs` |
 | `NOVAMED_UPLOAD_DIR` | `/data/uploads` |
+| `NOVAMED_SMTP_HOST` | vacío (correo desactivado) |
+| `NOVAMED_SMTP_PORT` | `587` |
+| `NOVAMED_SMTP_USER` | vacío |
+| `NOVAMED_SMTP_PASS` | vacío |
+| `NOVAMED_SMTP_FROM` | vacío |
+| `NOVAMED_SMTP_SSL` | `false` |
 | `TZ` | `UTC` (igual que Azure) |
+
+Para que **"Olvidé mi contraseña"** envíe correos reales, define las variables `NOVAMED_SMTP_*` en el archivo `.env`. Si quedan vacías, el enlace de recuperación se escribe en `docker/logs/novamed-error.log`.
 
 La URL completa se usa porque dentro de la red de Docker no hace falta TLS. Fuera de ella, `Conexion.java` sigue exigiendo SSL cuando el host no es localhost.
 

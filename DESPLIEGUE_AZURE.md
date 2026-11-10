@@ -338,6 +338,35 @@ Sin esas variables la app usa `{catalina.base}/logs` y
 temporal. En Azure el sistema de archivos del contenedor es de solo lectura
 salvo `/home`, por eso conviene fijarlas.
 
+### Correo para "Olvidé mi contraseña"
+
+La recuperación genera un enlace de un solo uso que vence en 30 minutos. Para
+que el correo se envíe de verdad, configura un servidor SMTP:
+
+| Variable | Ejemplo (Gmail) |
+|---|---|
+| `NOVAMED_SMTP_HOST` | `smtp.gmail.com` |
+| `NOVAMED_SMTP_PORT` | `587` |
+| `NOVAMED_SMTP_USER` | `tucorreo@gmail.com` |
+| `NOVAMED_SMTP_PASS` | clave de aplicación de 16 caracteres |
+| `NOVAMED_SMTP_FROM` | `tucorreo@gmail.com` |
+| `NOVAMED_SMTP_SSL` | `false` (usa `true` con el puerto 465) |
+
+```powershell
+az webapp config appsettings set -g $RG -n $APP --settings `
+  NOVAMED_SMTP_HOST="smtp.gmail.com" `
+  NOVAMED_SMTP_PORT="587" `
+  NOVAMED_SMTP_USER="tucorreo@gmail.com" `
+  NOVAMED_SMTP_PASS="<clave-de-aplicacion>" `
+  NOVAMED_SMTP_FROM="tucorreo@gmail.com" `
+  NOVAMED_SMTP_SSL="false"
+```
+
+Si no se configuran, el enlace se escribe en `novamed-error.log` (modo
+desarrollo) y el flujo sigue funcionando. El enlace se envía al correo guardado
+en `usuario.email`, así que ese dato debe ser un buzón real: el usuario `admin`
+del dump tiene un correo ficticio (`admin@hospital.com`).
+
 ### Verificar que quedó bien
 
 ```powershell

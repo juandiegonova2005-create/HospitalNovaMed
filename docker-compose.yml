@@ -64,6 +64,14 @@ services:
       NOVAMED_DB_PASS: ${NOVAMED_DB_PASS:-NovaMed#2026}
       NOVAMED_LOG_DIR: /usr/local/tomcat/logs
       NOVAMED_UPLOAD_DIR: /data/uploads
+      # Correo para "Olvide mi contrasena". Si quedan vacias, el enlace se
+      # escribe en novamed-error.log en lugar de enviarse.
+      NOVAMED_SMTP_HOST: ${NOVAMED_SMTP_HOST:-}
+      NOVAMED_SMTP_PORT: ${NOVAMED_SMTP_PORT:-587}
+      NOVAMED_SMTP_USER: ${NOVAMED_SMTP_USER:-}
+      NOVAMED_SMTP_PASS: ${NOVAMED_SMTP_PASS:-}
+      NOVAMED_SMTP_FROM: ${NOVAMED_SMTP_FROM:-}
+      NOVAMED_SMTP_SSL: ${NOVAMED_SMTP_SSL:-false}
       TZ: UTC
     ports:
       - "${NOVAMED_HTTP_PORT:-8081}:8080"
