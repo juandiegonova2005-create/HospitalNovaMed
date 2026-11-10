@@ -96,7 +96,11 @@ public class Correo {
             msg.setSentDate(new Date());
             Transport.send(msg);
             Log.info("CORREO enviado a " + destino + " | " + asunto);
-        } catch (Exception e) {
+        } catch (Throwable e) {
+            // Se captura Throwable a proposito: si falta una libreria (por ejemplo
+            // jakarta.activation), la JVM lanza NoClassDefFoundError, que no es una
+            // Exception y tumbaría la peticion HTTP. El flujo de recuperacion debe
+            // seguir respondiendo aunque el correo no se pueda enviar.
             // La clave nunca se registra; solo el motivo del fallo.
             Log.error("ERROR AL ENVIAR CORREO a " + destino + ": " + e.getMessage(), e);
             Log.info("CORREO (no enviado) para " + destino + " | " + asunto + " | " + cuerpo);

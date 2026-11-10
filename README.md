@@ -94,7 +94,7 @@ El detalle de cada control y sus pruebas está en [`CAMBIOS_SEGURIDAD.md`](CAMBI
 | Servidor | Apache Tomcat 11 |
 | Base de datos | MySQL 8.0 |
 | Driver | mysql-connector-j 9.6.0 |
-| Correo | Jakarta Mail 2.0.1 (SMTP) |
+| Correo | Jakarta Mail 2.0.1 + Jakarta Activation 2.1.3 (SMTP) |
 | Hash | jBCrypt 0.4 |
 | Contenedores | Docker + Docker Compose |
 | Nube | Azure App Service (Linux) + Azure Database for MySQL Flexible Server |
